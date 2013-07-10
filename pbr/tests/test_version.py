@@ -15,6 +15,10 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+import os
+
+import fixtures
+
 from pbr import tests
 from pbr import version
 
@@ -29,3 +33,28 @@ class DeferredVersionTestCase(tests.BaseTestCase):
         deferred_string = MyVersionInfo("openstack").\
             cached_version_string()
         self.assertEqual("5.5.5.5", deferred_string)
+
+
+class FindConfigFilesTestCase(tests.BaseTestCase):
+
+    def _monkey_patch(self, config_files):
+        self.useFixture(fixtures.MonkeyPatch('sys.argv', ['foo']))
+        self.useFixture(fixtures.MonkeyPatch('os.path.exists',
+                        lambda p: p in config_files))
+
+    def test_find_config_files(self):
+        config_files = [os.path.expanduser('~/.blaa/blaa.conf'),
+                        '/etc/foo.conf']
+        self._monkey_patch(config_files)
+
+        self.assertEqual(
+            config_files, version._find_config_files(project='blaa'))
+
+    def test_find_config_files_with_extension(self):
+        config_files = ['/etc/foo.json']
+        self._monkey_patch(config_files)
+
+        self.assertEqual([], version._find_config_files(project='blaa'))
+        self.assertEqual(config_files,
+                         version._find_config_files(project='blaa',
+                                                    extension='.json'))
