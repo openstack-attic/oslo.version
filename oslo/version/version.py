@@ -147,10 +147,11 @@ class VersionInfo(object):
         return "VersionInfo(%s:%s)" % (self.package, self.version_string())
 
     def _load_from_setup_cfg(self):
-        import d2to1.util
-        parsed_cfg = d2to1.util.cfg_to_args()
-        self.vendor = parsed_cfg['author']
-        self.product = parsed_cfg['description']
+        cfg = configparser.RawConfigParser()
+        cfg.read('setup.cfg')
+
+        self.vendor = cfg.get('metadata', 'author', None)
+        self.product = cfg.get('metadata', 'description', None)
 
     def _load_from_pkg_info(self, provider):
         import email
@@ -159,12 +160,8 @@ class VersionInfo(object):
         self.product = pkg_info['Summary']
 
     def _load_from_cfg_file(self, cfgfile):
-        try:
-            cfg = configparser.RawConfigParser()
-            cfg.read(cfgfile)
-
-        except Exception:
-            return
+        cfg = configparser.RawConfigParser()
+        cfg.read(cfgfile)
 
         project_name = self.package
         if project_name.startswith('python-'):
@@ -216,8 +213,14 @@ class VersionInfo(object):
             # The most likely cause for this is running tests in a tree
             # produced from a tarball where the package itself has not been
             # installed into anything. Revert to setup-time logic.
-            from pbr import packaging
-            return packaging.get_version(self.package)
+            try:
+                from pbr import packaging
+                return packaging.get_version(self.package)
+            except ImportError:
+                # You're killing me. We've got nothing here.
+                print("Unable to import pbr, or find pkg_resources")
+                print("information for %s" % self.package)
+                raise
 
     def release_string(self):
         """Return the full version of the package including suffixes indicating

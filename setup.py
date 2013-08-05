@@ -14,9 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# THIS FILE IS MANAGED BY THE GLOBAL REQUIREMENTS REPO - DO NOT EDIT
 import setuptools
 
-from pbr.d2to1 import util
-
 setuptools.setup(
-    **util.cfg_to_args())
+    setup_requires=['pbr>=0.5.20'],
+    pbr=True)

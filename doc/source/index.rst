@@ -1,9 +1,7 @@
-pbr - Python Build Reasonableness
-=================================
+oslo.version - version handling
+===============================
 
-A library for managing setuptools packaging needs in a consistent manner.
-
-PBR is not a library about beer.
+A library for managing versions of installed software at runtime
 
 Indices and tables
 ==================

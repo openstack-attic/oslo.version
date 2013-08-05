@@ -1,6 +1,7 @@
 # vim: tabstop=4 shiftwidth=4 softtabstop=4
 
 # Copyright 2010-2011 OpenStack Foundation
+# Copyright (c) 2013 Hewlett-Packard Development Company, L.P.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -16,13 +17,17 @@
 
 """Common utilities used in testing"""
 
+__all__ = [
+    'BaseTestCase'
+]
+
 import os
 
 import fixtures
 import testresources
 import testtools
 
-from pbr import packaging
+_TRUE_VALUES = ('true', '1', 'yes')
 
 
 class BaseTestCase(testtools.TestCase, testresources.ResourcedTestCase):
@@ -40,14 +45,11 @@ class BaseTestCase(testtools.TestCase, testresources.ResourcedTestCase):
         if test_timeout > 0:
             self.useFixture(fixtures.Timeout(test_timeout, gentle=True))
 
-        if os.environ.get('OS_STDOUT_CAPTURE') in packaging.TRUE_VALUES:
+        if os.environ.get('OS_STDOUT_CAPTURE') in _TRUE_VALUES:
             stdout = self.useFixture(fixtures.StringStream('stdout')).stream
             self.useFixture(fixtures.MonkeyPatch('sys.stdout', stdout))
-        if os.environ.get('OS_STDERR_CAPTURE') in packaging.TRUE_VALUES:
+        if os.environ.get('OS_STDERR_CAPTURE') in _TRUE_VALUES:
             stderr = self.useFixture(fixtures.StringStream('stderr')).stream
             self.useFixture(fixtures.MonkeyPatch('sys.stderr', stderr))
-        self.log_fixture = self.useFixture(
-            fixtures.FakeLogger('pbr'))
 
         self.useFixture(fixtures.NestedTempfile())
-        self.useFixture(fixtures.FakeLogger())
