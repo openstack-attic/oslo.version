@@ -257,20 +257,3 @@ class VersionInfo(object):
     def suffix_string(self):
         self._load_vendor_strings()
         return self.suffix
-
-    # Compatibility functions
-    canonical_version_string = version_string
-    version_string_with_vcs = release_string
-    package_string = suffix_string
-
-    def cached_version_string(self, prefix=""):
-        """Generate an object which will expand in a string context to
-        the results of version_string(). We do this so that don't
-        call into pkg_resources every time we start up a program when
-        passing version information into the CONF constructor, but
-        rather only do the calculation when and if a version is requested
-        """
-        if not self._cached_version:
-            self._cached_version = "%s%s" % (prefix,
-                                             self.version_string())
-        return self._cached_version

@@ -23,18 +23,6 @@ from oslo.version import version
 import tests
 
 
-class DeferredVersionTestCase(tests.BaseTestCase):
-
-    def test_cached_version(self):
-        class MyVersionInfo(version.VersionInfo):
-            def _get_version_from_pkg_resources(self):
-                return "5.5.5.5"
-
-        deferred_string = MyVersionInfo("openstack").\
-            cached_version_string()
-        self.assertEqual("5.5.5.5", deferred_string)
-
-
 class FindConfigFilesTestCase(tests.BaseTestCase):
 
     def _monkey_patch(self, config_files):
