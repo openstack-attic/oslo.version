@@ -19,8 +19,8 @@ import os
 
 import fixtures
 
-from oslo.version import tests
 from oslo.version import version
+import tests
 
 
 class DeferredVersionTestCase(tests.BaseTestCase):
