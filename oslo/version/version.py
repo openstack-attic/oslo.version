@@ -131,35 +131,35 @@ class VersionInfo(object):
                         python-glanceclient
         """
         self.package = package
-        self.release = None
-        self.version = None
-        self.vendor = None
-        self.product = None
-        self.suffix = None
+        self._release = None
+        self._version = None
+        self._vendor = None
+        self._product = None
+        self._suffix = None
         self._cached_version = None
         self._provider = None
         self._loaded = False
 
     def __str__(self):
         """Make the VersionInfo object behave like a string."""
-        return self.version_string()
+        return self.version
 
     def __repr__(self):
         """Include the name."""
-        return "VersionInfo(%s:%s)" % (self.package, self.version_string())
+        return "VersionInfo(%s:%s)" % (self.package, self.version)
 
     def _load_from_setup_cfg(self):
         cfg = configparser.RawConfigParser()
         cfg.read('setup.cfg')
 
-        self.vendor = cfg.get('metadata', 'author', None)
-        self.product = cfg.get('metadata', 'description', None)
+        self._vendor = cfg.get('metadata', 'author', None)
+        self._product = cfg.get('metadata', 'description', None)
 
     def _load_from_pkg_info(self, provider):
         import email
         pkg_info = email.message_from_string(provider.get_metadata('PKG-INFO'))
-        self.vendor = pkg_info['Author']
-        self.product = pkg_info['Summary']
+        self._vendor = pkg_info['Author']
+        self._product = pkg_info['Summary']
 
     def _load_from_cfg_file(self, cfgfile):
         cfg = configparser.RawConfigParser()
@@ -169,9 +169,9 @@ class VersionInfo(object):
         if project_name.startswith('python-'):
             project_name = project_name[7:]
 
-        self.vendor = cfg.get(project_name, "vendor", self.vendor)
-        self.product = cfg.get(project_name, "product", self.product)
-        self.suffix = cfg.get(project_name, "package", self.suffix)
+        self._vendor = cfg.get(project_name, "vendor", self._vendor)
+        self._product = cfg.get(project_name, "product", self._product)
+        self._suffix = cfg.get(project_name, "package", self._suffix)
 
     def _load_vendor_strings(self):
         """Load default and override vendor strings.
@@ -224,36 +224,41 @@ class VersionInfo(object):
                 print("information for %s" % self.package)
                 raise
 
-    def release_string(self):
+    @property
+    def release(self):
         """Return the full version of the package including suffixes indicating
         VCS status.
         """
-        if self.release is None:
-            self.release = self._get_version_from_pkg_resources()
+        if self._release is None:
+            self._release = self._get_version_from_pkg_resources()
 
-        return self.release
+        return self._release
 
-    def version_string(self):
+    @property
+    def version(self):
         """Return the short version minus any alpha/beta tags."""
-        if self.version is None:
+        if self._version is None:
             parts = []
-            for part in self.release_string().split('.'):
+            for part in self.release.split('.'):
                 if part[0].isdigit():
                     parts.append(part)
                 else:
                     break
-            self.version = ".".join(parts)
+            self._version = ".".join(parts)
 
-        return self.version
+        return self._version
 
-    def vendor_string(self):
+    @property
+    def vendor(self):
         self._load_vendor_strings()
-        return self.vendor
+        return self._vendor
 
-    def product_string(self):
+    @property
+    def product(self):
         self._load_vendor_strings()
-        return self.product
+        return self._product
 
-    def suffix_string(self):
+    @property
+    def suffix(self):
         self._load_vendor_strings()
-        return self.suffix
+        return self._suffix
