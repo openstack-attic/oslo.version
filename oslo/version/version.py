@@ -14,6 +14,8 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+__all__ = ['VersionInfo']
+
 """
 Utilities for consuming the version from pkg_resources.
 """
