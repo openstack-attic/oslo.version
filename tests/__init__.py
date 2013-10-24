@@ -22,6 +22,7 @@ __all__ = [
 ]
 
 import os
+import tempfile
 
 import fixtures
 import testresources
@@ -53,3 +54,24 @@ class BaseTestCase(testtools.TestCase, testresources.ResourcedTestCase):
             self.useFixture(fixtures.MonkeyPatch('sys.stderr', stderr))
 
         self.useFixture(fixtures.NestedTempfile())
+
+    @staticmethod
+    def write_to_tempfile(content, suffix='', prefix='tmp'):
+        """Create temporary file or use existing file.
+
+        This util is needed for creating temporary file with
+        specified content, suffix and prefix.
+
+        :param content: content for temporary file.
+        :param suffix: same as parameter 'suffix' for mkstemp
+        :param prefix: same as parameter 'prefix' for mkstemp
+
+        For example: it can be used in database tests for creating
+        configuration files.
+        """
+        (fd, path) = tempfile.mkstemp(suffix=suffix, prefix=prefix)
+        try:
+            os.write(fd, content.encode('utf-8'))
+        finally:
+            os.close(fd)
+        return path

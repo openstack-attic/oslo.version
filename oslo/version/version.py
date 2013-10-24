@@ -169,9 +169,9 @@ class VersionInfo(object):
         if project_name.startswith('python-'):
             project_name = project_name[7:]
 
-        self._vendor = cfg.get(project_name, "vendor", self._vendor)
-        self._product = cfg.get(project_name, "product", self._product)
-        self._suffix = cfg.get(project_name, "package", self._suffix)
+        self._vendor = cfg.get(project_name, "vendor")
+        self._product = cfg.get(project_name, "product")
+        self._suffix = cfg.get(project_name, "package")
 
     def _load_vendor_strings(self):
         """Load default and override vendor strings.
